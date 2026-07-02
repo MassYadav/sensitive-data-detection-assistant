@@ -158,30 +158,15 @@ def _get_embeddings(provider: str):
         from langchain_openai import OpenAIEmbeddings
         return OpenAIEmbeddings(api_key=api_key_val, model="text-embedding-3-small")
 
-    # For Groq and OpenRouter, use Google embeddings if available, else OpenAI
-    import streamlit as st
-
+    # For Groq and OpenRouter, use local HuggingFace embeddings
+    # This prevents 404 API crashes and doesn't require any API keys!
     try:
-        google_key = _get_api_key("google")
-        from langchain_google_genai import GoogleGenerativeAIEmbeddings
-        return GoogleGenerativeAIEmbeddings(
-            model="models/text-embedding-004",
-            google_api_key=google_key,
+        from langchain_community.embeddings import HuggingFaceEmbeddings
+        return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    except ImportError:
+        raise ImportError(
+            "Please add 'sentence-transformers' to requirements.txt for free local embeddings."
         )
-    except Exception:
-        pass
-
-    try:
-        openai_key = _get_api_key("openai")
-        from langchain_openai import OpenAIEmbeddings
-        return OpenAIEmbeddings(api_key=openai_key, model="text-embedding-3-small")
-    except Exception:
-        pass
-
-    raise ValueError(
-        "Groq/OpenRouter don't provide embeddings natively here. "
-        "Please set GOOGLE_API_KEY or OPENAI_API_KEY in .env (or Streamlit secrets) for RAG embeddings."
-    )
 
 
 def build_faiss_index(text: str, provider: str = "google"):
