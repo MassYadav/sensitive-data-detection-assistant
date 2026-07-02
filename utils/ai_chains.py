@@ -159,22 +159,28 @@ def _get_embeddings(provider: str):
         return OpenAIEmbeddings(api_key=api_key_val, model="text-embedding-3-small")
 
     # For Groq and OpenRouter, use Google embeddings if available, else OpenAI
-    google_key = os.getenv("GOOGLE_API_KEY", "")
-    if google_key and not google_key.startswith("your-"):
+    import streamlit as st
+
+    try:
+        google_key = _get_api_key("google")
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
         return GoogleGenerativeAIEmbeddings(
             model="models/embedding-001",
             google_api_key=google_key,
         )
+    except Exception:
+        pass
 
-    openai_key = os.getenv("OPENAI_API_KEY", "")
-    if openai_key and not openai_key.startswith("your-"):
+    try:
+        openai_key = _get_api_key("openai")
         from langchain_openai import OpenAIEmbeddings
         return OpenAIEmbeddings(api_key=openai_key, model="text-embedding-3-small")
+    except Exception:
+        pass
 
     raise ValueError(
-        "Groq/OpenRouter don't provide embeddings. "
-        "Please set GOOGLE_API_KEY or OPENAI_API_KEY in .env for RAG embeddings."
+        "Groq/OpenRouter don't provide embeddings natively here. "
+        "Please set GOOGLE_API_KEY or OPENAI_API_KEY in .env (or Streamlit secrets) for RAG embeddings."
     )
 
 
