@@ -216,3 +216,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ── Project-specific ──
+# Audit logs (generated at runtime)
+audit.log
+
+# FAISS vector store (generated at runtime)
+faiss_index/
+*.faiss
+*.pkl
+
+# Uploaded test documents (don't commit user data)
+uploads/
