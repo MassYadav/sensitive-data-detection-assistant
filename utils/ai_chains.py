@@ -56,18 +56,36 @@ PROVIDERS = {
 # ── LLM Factory ─────────────────────────────────────────────────────────────
 
 def _get_api_key(provider: str) -> str:
-    """Retrieve and validate the API key for a provider."""
+    """Retrieve and validate the API key for a provider.
+
+    Checks ``os.environ`` first (for local ``.env``), then falls back to
+    ``st.secrets`` (for Streamlit Community Cloud deployment).
+    """
+    import streamlit as st
+
     info = PROVIDERS.get(provider)
     if info is None:
         raise ValueError(
             f"Unknown provider '{provider}'. "
             f"Choose from: {', '.join(PROVIDERS)}"
         )
-    api_key = os.getenv(info["key_env"], "")
+
+    key_name = info["key_env"]
+
+    # 1. Try os.environ (loaded from .env locally)
+    api_key = os.getenv(key_name, "")
+
+    # 2. Fallback to st.secrets (Streamlit Cloud)
+    if not api_key or api_key.startswith("your-"):
+        try:
+            api_key = st.secrets.get(key_name, "")
+        except Exception:
+            api_key = ""
+
     if not api_key or api_key.startswith("your-"):
         raise ValueError(
-            f"{info['key_env']} is not set. "
-            f"Please add it to your .env file."
+            f"{key_name} is not set. "
+            f"Add it to your .env file or Streamlit Cloud secrets."
         )
     return api_key
 
