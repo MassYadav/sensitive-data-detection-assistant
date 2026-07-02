@@ -150,7 +150,7 @@ def _get_embeddings(provider: str):
     if provider == "google":
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
         return GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
+            model="models/text-embedding-004",
             google_api_key=api_key_val,
         )
 
@@ -165,7 +165,7 @@ def _get_embeddings(provider: str):
         google_key = _get_api_key("google")
         from langchain_google_genai import GoogleGenerativeAIEmbeddings
         return GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
+            model="models/text-embedding-004",
             google_api_key=google_key,
         )
     except Exception:
