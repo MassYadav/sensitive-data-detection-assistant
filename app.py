@@ -304,6 +304,7 @@ with tab_dash:
     ]
     if unreported:
         if st.button("🚀 Generate AI Report(s)", type="primary", use_container_width=True):
+            has_error = False
             for fname in unreported:
                 text = st.session_state.documents[fname]
                 result = st.session_state.scan_results[fname]
@@ -323,7 +324,10 @@ with tab_dash:
                     except Exception as exc:
                         log_error("report_generation", str(exc))
                         st.error(f"⚠️ {fname}: {exc}")
-            st.rerun()
+                        has_error = True
+            
+            if not has_error:
+                st.rerun()
     else:
         if st.session_state.ai_reports:
             if st.button("🔄 Regenerate All Reports"):
